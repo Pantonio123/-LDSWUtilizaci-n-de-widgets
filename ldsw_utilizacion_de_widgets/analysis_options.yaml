@@ -1,0 +1,39 @@
+
+# Importa las reglas básicas recomendadas por Flutter:
+include: package:flutter_lints/flutter.yaml
+
+# Puedes personalizar o agregar reglas adicionales aquí.
+linter:
+  rules:
+    #  Buenas prácticas generales
+    avoid_print: true            # Evita usar print() en producción
+    prefer_const_constructors: true
+    prefer_final_fields: true
+    sort_child_properties_last: true
+    use_key_in_widget_constructors: true
+
+    #  Legibilidad y estilo
+    prefer_single_quotes: true   # Usa comillas simples por consistencia
+    always_declare_return_types: true
+    always_put_control_body_on_new_line: true
+    always_specify_types: false  # Permite inferencia automática de tipos
+
+    #  Organización
+    lines_longer_than_80_chars: false  # Permite líneas más largas si es necesario
+    curly_braces_in_flow_control_structures: true
+    prefer_const_literals_to_create_immutables: true
+
+analyzer:
+  exclude:
+    # Ignora archivos generados automáticamente
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+    - '**/*.mocks.dart'
+
+  errors:
+    # Configura niveles de severidad
+    missing_required_param: error
+    missing_return: error
+    dead_code: warning
+    unused_import: warning
+    unnecessary_null_checks: info
