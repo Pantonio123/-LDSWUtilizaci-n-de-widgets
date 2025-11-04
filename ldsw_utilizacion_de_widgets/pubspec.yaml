@@ -14,6 +14,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  shared_preferences: ^2.0.15  
+
   # Iconos de Material (ya incluidos con Flutter)
   cupertino_icons: ^1.0.8
 
@@ -26,3 +28,6 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+  assets: 
+    - assets/images/cine_bg.jpg
+

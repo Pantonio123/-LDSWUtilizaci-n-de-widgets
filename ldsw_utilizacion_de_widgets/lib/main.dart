@@ -8,151 +8,210 @@ class CatalogoPeliculasApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RecomiedaPelis',
-      theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        scaffoldBackgroundColor: Colors.grey[100],
-      ),
-      home: const CatalogoPage(),
+      title: 'LDSW - Catálogo de Películas',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const LaunchAlwaysWelcome(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class CatalogoPage extends StatelessWidget {
-  const CatalogoPage({super.key});
+class LaunchAlwaysWelcome extends StatefulWidget {
+  const LaunchAlwaysWelcome({super.key});
+
+  @override
+  State<LaunchAlwaysWelcome> createState() => _LaunchAlwaysWelcomeState();
+}
+
+class _LaunchAlwaysWelcomeState extends State<LaunchAlwaysWelcome> {
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => WelcomeScreen(
+            onClose: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      );
+      setState(() => _loading = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    return const CatalogPage();
+  }
+}
+
+/// Pantalla modal de bienvenida
+class WelcomeScreen extends StatelessWidget {
+  final VoidCallback onClose;
+  const WelcomeScreen({super.key, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('🍿 RecomiedaPelis'),
-        centerTitle: true,
+      body: Stack(
+        children: [
+          // Fondo con imagen local
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/cine_bg.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          // Capa oscura arriba del fondo
+          Container(
+            color: Colors.black.withOpacity(0.60),
+          ),
+
+          SafeArea(
+            child: Stack(
+              children: [
+                // Botón X para cerrar
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: GestureDetector(
+                    onTap: onClose,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 22,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Tarjeta de bienvenida centrada
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.local_movies,
+                                size: 50, color: Colors.indigo),
+                            const SizedBox(height: 12),
+                            const Text(
+                              '¡Bienvenido a 🍿 RecomiedaPelis',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Explora películas, estrenos y clásicos del cine 🍿🎬',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 15),
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: onClose,
+                              child: const Text('Comenzar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+
+/// Página principal (catálogo)
+class CatalogPage extends StatelessWidget {
+  const CatalogPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('🎬 Catálogo de Películas')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Título principal
-            const Text(
-              'Explora los estrenos y clásicos del cine',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
+            const Text('Explora los estrenos y clásicos', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 12),
+            // ejemplo de tarjeta
+            _movieCard(
+              'Inception',
+              'Ciencia ficción',
+              4.8,
+              'https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg',
             ),
-
-            const SizedBox(height: 20),
-
-            // Películas (ejemplo con 3 tarjetas)
-            _tarjetaPelicula(
-              titulo: 'Inception',
-              genero: 'Ciencia ficción',
-              calificacion: 4.8,
-              urlImagen: 'https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg', //usare the movie data base para las imagenes 
+            _movieCard(
+              'Interstellar',
+              'Drama / Ciencia ficción',
+              4.9,
+              'https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg',
             ),
-            _tarjetaPelicula(
-              titulo: 'Interstellar',
-              genero: 'Drama / Ciencia ficción',
-              calificacion: 4.9,
-              urlImagen: 'https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg',
+            _movieCard(
+              'The Dark Knight',
+              'Acción / Suspenso',
+              4.7,
+              'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
             ),
-            _tarjetaPelicula(
-              titulo: 'The Dark Knight',
-              genero: 'Acción / Suspenso',
-              calificacion: 4.7,
-              urlImagen: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
-            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 
-  // Widget personalizado: tarjeta de película
-  Widget _tarjetaPelicula({
-    required String titulo,
-    required String genero,
-    required double calificacion,
-    required String urlImagen,
-  }) {
+  Widget _movieCard(String title, String genre, double rating, String imageUrl) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [
+        BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 6, offset: const Offset(0, 4))
+      ]),
       child: Stack(
-        alignment: Alignment.bottomLeft,
         children: [
-          // Imagen de fondo (póster)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Image.network(
-              urlImagen,
-              height: 220,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          // Capa oscura sobre la imagen
-          Container(
-            height: 220,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.black.withOpacity(0.4),
-            ),
-          ),
-
-          // Contenido de texto superpuesto (Stack)
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  titulo,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                // Row: género y calificación
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      genero,
-                      style: const TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.yellow, size: 18),
-                        Text(
-                          calificacion.toString(),
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.network(imageUrl, height: 220, width: double.infinity, fit: BoxFit.cover)),
+          Container(height: 220, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.35))),
+          Positioned(bottom: 12, left: 12, right: 12, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text(genre, style: const TextStyle(color: Colors.white70)),
+              Row(children: [const Icon(Icons.star, color: Colors.yellow, size: 18), const SizedBox(width: 6), Text(rating.toString(), style: const TextStyle(color: Colors.white))])
+            ])
+          ])),
         ],
       ),
     );
