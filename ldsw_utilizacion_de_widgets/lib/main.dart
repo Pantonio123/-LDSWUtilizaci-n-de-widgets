@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'services/tmdb_service.dart';
+import 'pages/movies_page.dart';
+
+const String tmdbApiKey = String.fromEnvironment('TMDB_API_KEY', defaultValue: '');
 
 void main() => runApp(const CatalogoPeliculasApp());
 
@@ -153,22 +157,42 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-
 /// Página principal (catálogo)
 class CatalogPage extends StatelessWidget {
   const CatalogPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Crea el servicio de TMDb 
+    final tmdb = TMDBService(apiKey: tmdbApiKey);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('🎬 Catálogo de Películas')),
+      appBar: AppBar(
+        title: const Text('🎬 Catálogo de Películas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.movie),
+            tooltip: 'Películas (TMDb)',
+            onPressed: () {
+              if (tmdbApiKey.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Falta TMDB_API_KEY. Ejecuta con --dart-define=TMDB_API_KEY=TU_KEY')),
+                );
+                return;
+              }
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => MoviesPage(tmdb: tmdb)),
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             const Text('Explora los estrenos y clásicos', style: TextStyle(fontSize: 18)),
             const SizedBox(height: 12),
-            // ejemplo de tarjeta
             _movieCard(
               'Inception',
               'Ciencia ficción',
