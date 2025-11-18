@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; 
+
 import 'services/tmdb_service.dart';
 import 'pages/movies_page.dart';
 
 const String tmdbApiKey = String.fromEnvironment('TMDB_API_KEY', defaultValue: '');
 
-void main() => runApp(const CatalogoPeliculasApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+
+    debugPrint('Aviso: Firebase no pudo inicializarse: $e');
+  }
+
+  runApp(const CatalogoPeliculasApp());
+}
 
 class CatalogoPeliculasApp extends StatelessWidget {
   const CatalogoPeliculasApp({super.key});
@@ -67,7 +82,6 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Fondo con imagen local
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -77,10 +91,8 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
 
-          // Capa oscura arriba del fondo
-          Container(
-            color: Colors.black.withOpacity(0.60),
-          ),
+          // Capa oscura para legibilidad
+          Container(color: Colors.black.withOpacity(0.60)),
 
           SafeArea(
             child: Stack(
@@ -93,15 +105,8 @@ class WelcomeScreen extends StatelessWidget {
                     onTap: onClose,
                     child: Container(
                       padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        size: 22,
-                        color: Colors.black,
-                      ),
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                      child: const Icon(Icons.close, size: 22, color: Colors.black),
                     ),
                   ),
                 ),
@@ -111,39 +116,27 @@ class WelcomeScreen extends StatelessWidget {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 420),
                     child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 5,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.local_movies,
-                                size: 50, color: Colors.indigo),
-                            const SizedBox(height: 12),
-                            const Text(
-                              '¡Bienvenido a 🍿 RecomiedaPelis',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'Explora películas, estrenos y clásicos del cine 🍿🎬',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: onClose,
-                              child: const Text('Comenzar'),
-                            ),
-                          ],
-                        ),
+                        child: Column(mainAxisSize: MainAxisSize.min, children: [
+                          const Icon(Icons.local_movies, size: 50, color: Colors.indigo),
+                          const SizedBox(height: 12),
+                          const Text(
+                            '¡Bienvenido a RecomiedaPelis 🍿',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Explora películas, estrenos y clásicos del cine 🍿🎬',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 15),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(onPressed: onClose, child: const Text('Comenzar')),
+                        ]),
                       ),
                     ),
                   ),
@@ -163,7 +156,6 @@ class CatalogPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Crea el servicio de TMDb 
     final tmdb = TMDBService(apiKey: tmdbApiKey);
 
     return Scaffold(
@@ -180,40 +172,36 @@ class CatalogPage extends StatelessWidget {
                 );
                 return;
               }
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => MoviesPage(tmdb: tmdb)),
-              );
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => MoviesPage(tmdb: tmdb)));
             },
           ),
         ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text('Explora los estrenos y clásicos', style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 12),
-            _movieCard(
-              'Inception',
-              'Ciencia ficción',
-              4.8,
-              'https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg',
-            ),
-            _movieCard(
-              'Interstellar',
-              'Drama / Ciencia ficción',
-              4.9,
-              'https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg',
-            ),
-            _movieCard(
-              'The Dark Knight',
-              'Acción / Suspenso',
-              4.7,
-              'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
+        child: Column(children: [
+          const Text('Explora los estrenos y clásicos', style: TextStyle(fontSize: 18)),
+          const SizedBox(height: 12),
+          _movieCard(
+            'Inception',
+            'Ciencia ficción',
+            4.8,
+            'https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg',
+          ),
+          _movieCard(
+            'Interstellar',
+            'Drama / Ciencia ficción',
+            4.9,
+            'https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg',
+          ),
+          _movieCard(
+            'The Dark Knight',
+            'Acción / Suspenso',
+            4.7,
+            'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
+          ),
+          const SizedBox(height: 24),
+        ]),
       ),
     );
   }
@@ -224,20 +212,23 @@ class CatalogPage extends StatelessWidget {
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [
         BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 6, offset: const Offset(0, 4))
       ]),
-      child: Stack(
-        children: [
-          ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.network(imageUrl, height: 220, width: double.infinity, fit: BoxFit.cover)),
-          Container(height: 220, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.35))),
-          Positioned(bottom: 12, left: 12, right: 12, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      child: Stack(children: [
+        ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.network(imageUrl, height: 220, width: double.infinity, fit: BoxFit.cover)),
+        Container(height: 220, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.35))),
+        Positioned(
+          bottom: 12,
+          left: 12,
+          right: 12,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(genre, style: const TextStyle(color: Colors.white70)),
               Row(children: [const Icon(Icons.star, color: Colors.yellow, size: 18), const SizedBox(width: 6), Text(rating.toString(), style: const TextStyle(color: Colors.white))])
             ])
-          ])),
-        ],
-      ),
+          ]),
+        ),
+      ]),
     );
   }
 }

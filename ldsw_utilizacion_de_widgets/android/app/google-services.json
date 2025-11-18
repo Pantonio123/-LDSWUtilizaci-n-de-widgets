@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "653784148768",
+    "project_id": "diseno-de-aplicaciones-moviles",
+    "storage_bucket": "diseno-de-aplicaciones-moviles.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:653784148768:android:841a3c972e437c2df68545",
+        "android_client_info": {
+          "package_name": "com.example.ldsw_utilizacion_de_widgets"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuldcP2r1OTM1ucil8TQr2PLAPTJ74uH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
