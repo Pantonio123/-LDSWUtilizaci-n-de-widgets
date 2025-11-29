@@ -11,7 +11,6 @@ class MoviesPage extends StatefulWidget {
 
 class _MoviesPageState extends State<MoviesPage> {
   late Future<List<dynamic>> _futureMovies;
-  String _query = '';
 
   @override
   void initState() {
@@ -21,7 +20,6 @@ class _MoviesPageState extends State<MoviesPage> {
 
   void _search(String text) {
     setState(() {
-      _query = text;
       _futureMovies = text.trim().isEmpty ? widget.tmdb.fetchPopularMovies() : widget.tmdb.searchMovies(text.trim());
     });
   }
@@ -129,12 +127,18 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
           if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
-          final movie = snapshot.data!;
+          final movie = snapshot.data!['movie'];
+          final credits = snapshot.data!['credits'];
           final posterPath = movie['poster_path'] as String?;
           final poster = posterPath != null ? widget.tmdb.posterUrl(posterPath) : null;
           final title = movie['title'] ?? 'Sin título';
           final overview = movie['overview'] ?? '';
           final releaseDate = movie['release_date'] ?? '';
+          final genre = movie['genres'][0]['name'] ?? '';
+          final director = (credits['crew'] as List).firstWhere(
+            (e) => e['job'] == 'Director', 
+            orElse: () => {'name': 'Desconocido'}
+          )['name'];
 
           return SingleChildScrollView(
             child: Column(
@@ -147,6 +151,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
+                    Text('Genero: $genre', style: const TextStyle(color: Colors.black54)),
+                    const SizedBox(height: 12),
+                    Text('Director: $director', style: const TextStyle(color: Colors.black54)),
+                    const SizedBox(height: 12),
                     Text('Fecha de estreno: $releaseDate', style: const TextStyle(color: Colors.black54)),
                     const SizedBox(height: 12),
                     Text(overview),

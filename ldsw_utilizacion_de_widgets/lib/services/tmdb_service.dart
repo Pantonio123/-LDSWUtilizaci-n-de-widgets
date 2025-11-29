@@ -39,10 +39,29 @@ class TMDBService {
 
   /// GET /movie/{movie_id}
   Future<Map<String, dynamic>> getMovieDetail(int movieId) async {
-    final uri = _buildUri('/3/movie/$movieId');
-    final resp = await http.get(uri).timeout(const Duration(seconds: 15));
-    if (resp.statusCode != 200) throw Exception('Error ${resp.statusCode}: ${resp.body}');
-    final Map<String, dynamic> jsonBody = json.decode(resp.body);
-    return jsonBody;
+    final movie_uri = _buildUri('/3/movie/$movieId');
+    final credits_uri = _buildUri('/3/movie/$movieId/credits');
+
+    final resp = await Future.wait([
+      http.get(movie_uri).timeout(const Duration(seconds: 15)),
+      http.get(credits_uri).timeout(const Duration(seconds: 15)),
+    ]);
+    final movieResp = resp[0];
+    final creditsResp = resp[1];
+
+    if (movieResp.statusCode != 200) {
+      throw Exception('Error ${movieResp.statusCode}: ${movieResp.body}');
+    }
+    if (creditsResp.statusCode != 200) {
+      throw Exception('Error ${creditsResp.statusCode}: ${creditsResp.body}');
+    }
+
+    final Map<String, dynamic> moviesJsonBody = json.decode(movieResp.body);
+    final Map<String, dynamic> creditsJsonBody = json.decode(creditsResp.body);
+
+    return {
+      'movie': moviesJsonBody,
+      'credits': creditsJsonBody,
+    };
   }
 }
